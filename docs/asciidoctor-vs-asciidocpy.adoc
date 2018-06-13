@@ -1,0 +1,80 @@
+= Asciidoctor vs AsciiDoc Python
+
+== Synopsis
+
+Asciidoctor is the modern AsciiDoc processor.
+The AsciiDoc syntax that Asciidoctor supports is the _official_ AsciiDoc syntax.
+Asciidoctor processes AsciiDoc at least 100x as fast as AsciiDoc Python.
+
+With minor exceptions, Asciidoctor can process any AsciiDoc document written for AsciiDoc Python (given compat mode is enabled).
+This is by design.
+Asciidoctor can also process newer additions to the language, such as a shorthand syntax for core block attributes, which AsciiDoc Python does not recognize.
+
+== Syntax Changes
+
+The https://asciidoctor.org/docs/migration/#legacy-syntax[migration guide] documents the changes in syntax between Asciidoctor and AsciiDoc Python.
+While most of the legacy syntax is still recognized when the `compat-mode` attribute is set, there are some notations that had to be dropped outright as a result of being fundamentally incompatible with the incoming changes.
+One such example are curved quotes, as the legacy syntax is incompatible with the modern syntax.
+
+The most notable improvement Asciidoctor brings to the AsciiDoc syntax is a shorthand syntax for core block attributes.
+Instead of having to write:
+
+[source,asciidoc]
+----
+[[id]]
+[style,role="role",options="option"]
+----
+
+You can write:
+
+[source,asciidoc]
+----
+[style#id.role%option]
+----
+
+Asciidoctor is also a lot less strict about where quotes are needed around attribute values.
+But it is more strict in other ways.
+For example, Asciidoctor requires that block delimiters be symmetric.
+However, it does warn when they are not so you know where to fix the syntax.
+
+== Enhancements
+
+The most notable difference between Asciidoctor and AsciiDoc Python is in how they convert the source document.
+AsciiDoc Python parses and converts the document all at once (streaming), whereas Asciidoctor parses and converts in separate steps.
+After the parse phase, the processor has a reference to a document model down to the level of blocks.
+This opens up huge possibilities, such as the ability to for extensions to manipulate the document.
+The document model is then passed to the selected converter to be converted to the output format.
+
+Another notable enhancement in Asciidoctor is support for partial includes.
+The include directive can be used to include specific lines from another file either based on line number or tagged regions.
+The include directive is also an extension point.
+By plugging in a custom include processor, you can handle the resolution of the include in a way that is specific to your application.
+
+Here's a more complete list of enhancements:
+
+* parse tree / document model (AST) containing optional line numbers
+* programmatic extension API
+* partial includes with sophisticated include/exclude/filtering support and indent control
+* MathJax integration (via stem attribute, blocks, and macros)
+* font-based admonition icons and callout numbers
+* inter-document cross references
+* configurable cross reference style
+* cleaner auto-generated section IDs
+* smarter section numbering
+* broader support for Unicode
+* fail-fast mode (CLI or programmatic)
+* attribute support for certain inline macros
+* consolidated footnote macro
+* table striping
+* SVG image support
+* a whole new, modern stylesheet
+* a pre-generated table of contents w/ more flexible positioning options
+
+With nearly 6 years of development over AsciiDoc Python, there are understandably features absent from this list.
+
+== Configuration Files / Extensions
+
+Asciidoctor does not support AsciiDoc Python's .conf files or filters, so `--conf-file`, `--dump-conf`, and `--filter` do not work.
+Instead, Asciidoctor provides a powerful https://asciidoctor.org/docs/user-manual/#extensions[extension API] to replace the configuration-based extension and filter mechanisms in AsciiDoc Python.
+
+The best way to learn about Asciidoctor's extensions are by studying the example extensions in the https://github.com/asciidoctor/asciidoctor-extensions-lab[extensions lab].
